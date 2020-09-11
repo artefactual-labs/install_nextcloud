@@ -1,5 +1,29 @@
 ---
-- name: "[INSTALL] -  Required and recommended packages are installed."
+
+- name: "[INSTALL] - Install epel repo (CentOS/RedHat)"
+  yum: 
+    name: "epel-release"
+    state: "installed"
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: "[INSTALL] - Enable epel repo (CentOS/RedHat)"
+  ini_file:
+    path: /etc/yum.repos.d/epel.repo
+    section: epel
+    option: enabled
+    value: 1
+  when:
+    - ansible_os_family == "RedHat"
+
+- name: "[INSTALL] - Install scl repo (CentOS)"
+  yum: 
+    name: "centos-release-scl"
+    state: "installed"
+  when:
+    - ansible_distribution == "CentOS"
+
+- name: "[INSTALL] -  Required and recommended packages are installed. (Debian/Ubuntu)"
   package:
     name: "{{ item }}"
     state: present
@@ -14,6 +38,26 @@
     - "php{{ php_ver }}-intl"
   notify:
     - start http
+  when:
+    - ansible_os_family == "Debian"
+
+- name: "[INSTALL] -  Required and recommended packages are installed. (CentOS/RedHat)"
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ nextcloud_websrv }}"
+    - samba-client
+    - "rh-php{{ php_ver }}-php-gd"
+    - "rh-php{{ php_ver }}-php-ldap"
+    - "rh-php{{ php_ver }}-php-imap"
+    - "rh-php{{ php_ver }}-php-json"
+    - "rh-php{{ php_ver }}-php-curl"
+    - "rh-php{{ php_ver }}-php-intl"
+  notify:
+    - start http
+  when:
+    - ansible_os_family == "RedHat"
 
 - name: "[INSTALL] -  Apache Required package is installed."
   package:
@@ -23,14 +67,27 @@
   notify:
     - start http
 
-- name: "[INSTALL] -  NGINX Required package is installed."
+- name: "[INSTALL] -  NGINX Required package is installed. (Debian/Ubuntu)"
   package:
     name: "php{{ php_ver }}-fpm"
     state: present
-  when: nextcloud_websrv == "nginx"
+  when: 
+    - nextcloud_websrv == "nginx"
+    - ansible_os_family == "Debian"
   notify:
     - start http
     - start php-fpm
+
+- name: "[INSTALL] -  NGINX Required package is installed. (CentOS/RedHat)"
+  package:
+    name: "rh-php{{ php_ver }}-php-fpm"
+    state: present
+  when: 
+    - nextcloud_websrv == "nginx"
+    - ansible_os_family == "RedHat"
+  notify:
+    - start http
+    - start php-fpm-rh
 
 - name: "[INSTALL] -  PHP extra Packages are installed."
   package:
@@ -38,6 +95,14 @@
     state: present
   with_items:
     - "{{ php_pkg_spe }}"
+
+- name: "Create /usr/bin/php link (Redhat/CentOS)"
+  file:
+    src: "/opt/rh/rh-php{{ php_ver }}/root/usr/bin/php"
+    dest: "/usr/bin/php"
+    state: "link"
+  when:
+    - ansible_os_family == "RedHat"
 
 - name: "[INSTALL] -  APCu is installed."
   package:

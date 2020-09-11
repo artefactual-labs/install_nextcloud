@@ -1,0 +1,3 @@
+---
+nextcloud_websrv_user: "nginx"
+nextcloud_websrv_group: "nginx"

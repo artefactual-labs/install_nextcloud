@@ -30,6 +30,16 @@
     name: php{{ php_ver }}-fpm
     state: reloaded
 
+- name: start php-fpm-rh
+  service:
+    name: rh-php{{ php_ver }}-php-fpm
+    state: started
+
+- name: reload php-fpm-rh
+  service:
+    name: rh-php{{ php_ver }}-php-fpm
+    state: reloaded
+
 - name: start redis
   service:
     name: redis-server

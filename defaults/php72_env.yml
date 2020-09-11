@@ -1,0 +1,19 @@
+---
+# [system]
+# system_configuration for php 7.2:
+php_dir: "/etc/opt/rh/rh-php72"
+php_bin: "php-fpm"
+php_pkg_apcu: "rh-php72-php-pecl-apcu"
+php_pkg_spe:
+  - "sclo-php72-php-imap"
+  - "sclo-php72-php-pecl-imagick"
+  - "sclo-php72-php-phpiredis"
+  - "sclo-php72-php-pecl-redis5"
+  - "rh-php72-php-cli"
+  - "rh-php72-php-xml"
+  - "rh-php72-php-zip"
+  - "rh-php72-php-mbstring"
+  - "rh-php72-php-pdo"
+  - "rh-php72-php-mysqlnd"
+  - "rh-php72-php-process"
+php_socket: "/var/run/php-fpm.sock"
